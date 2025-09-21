@@ -1,2 +1,2 @@
 # Candy Survival (fixed build)
-To run: python run.py
+TO RUN: python run.py

@@ -1,5 +1,6 @@
+import json
 import pygame
-from game.events import EVENTS
+from game.events import parse_event_definitions
 from game.states.playing import RECIPES
 
 
@@ -16,10 +17,22 @@ class InstructionState:
             "Pause: ESC",
             "Craft: Access crafting tablel and choose 1-4"
         ]
+        with open("settings.json", "r", encoding="utf-8") as handle:
+            settings = json.load(handle)
+        default_cost = int(settings.get("event_self_deprecation_counter_cost", 2))
+        raw_definitions = settings.get("event_definitions", [])
+        if not isinstance(raw_definitions, list):
+            raw_definitions = []
+        definitions = parse_event_definitions(raw_definitions, default_cost)
+
         self.event_counters=[]
-        for evt,item in EVENTS:
-            pretty_evt=evt.replace("_"," ").title()
-            self.event_counters.append(f"{pretty_evt} -> {item}")
+        for definition in definitions:
+            if definition.requires_any_counter:
+                requirement=f"Any counter x{definition.counter_amount}"
+            else:
+                item_label=definition.counter_item or "counter item"
+                requirement=f"{item_label} x{definition.counter_amount}"
+            self.event_counters.append(f"{definition.label} -> {requirement}")
         self.recipes=[]
         for result, need in RECIPES.items():
             parts=[]

@@ -1,6 +1,7 @@
 import pygame
 from typing import Callable, Dict, Optional, Tuple
 from core.inventory import Inventory, ItemStack
+from core.assets import get_candy_sprite_path, get_candy_display_name
 
 
 def load_sprite(path: str) -> pygame.Surface:
@@ -11,11 +12,7 @@ def load_sprite(path: str) -> pygame.Surface:
         placeholder.fill((70, 70, 80, 255))
         pygame.draw.rect(placeholder, (180, 180, 200, 255), placeholder.get_rect(), 2)
         return placeholder
-    surface = image.convert_alpha() if image.get_alpha() is not None else image.convert()
-    if path.endswith("candy_purple.bmp"):
-        surface = surface.copy()
-        surface.fill((160, 160, 160), special_flags=pygame.BLEND_RGB_MULT)
-    return surface
+    return image.convert_alpha() if image.get_alpha() is not None else image.convert()
 
 
 class UIAssets:
@@ -107,7 +104,8 @@ class InventoryUI:
                 stack = self.inventory.slots[index]
                 if stack:
                     try:
-                        icon = load_sprite(f"assets/sprites/{stack.item}.bmp")
+                        icon_path = get_candy_sprite_path(stack.item) or f"assets/sprites/{stack.item}.bmp"
+                        icon = load_sprite(icon_path)
                         surface.blit(icon, (x, y))
                     except Exception:
                         pass
@@ -152,7 +150,11 @@ class CraftingUI:
 
         cursor_y = top_left_y + 60
         for index, (result, recipe) in enumerate(self.recipes.items()):
-            need_text = ", ".join([f"{item}x{amount}" for item, amount in recipe.items()])
+            parts = []
+            for item, amount in recipe.items():
+                label = get_candy_display_name(item) if item.startswith("candy_") else item
+                parts.append(f"{label} x{amount}")
+            need_text = ", ".join(parts)
             status = ""
             if self._requirement_formatter:
                 status = f" ({self._requirement_formatter(result, recipe)})"
@@ -221,7 +223,8 @@ class TrashUI:
         for index, stack in enumerate(self.inventory.slots):
             label = f"[{index + 1}] "
             if stack:
-                label += f"{stack.item} x{stack.count}"
+                name = get_candy_display_name(stack.item) if stack.item.startswith("candy_") else stack.item
+                label += f"{name} x{stack.count}"
                 color = (230, 230, 230)
             else:
                 label += "Empty"
@@ -229,6 +232,7 @@ class TrashUI:
             text_surface = self.ui_assets.font.render(label, True, color)
             surface.blit(text_surface, (top_left_x + 20, cursor_y))
             cursor_y += line_height
+
 class MessageLog:
     def __init__(self, font: pygame.font.Font):
         self.font = font

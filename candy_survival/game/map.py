@@ -1,6 +1,6 @@
 import json
 import random
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Optional, Tuple
 
 
 class TileMap:
@@ -15,6 +15,20 @@ class TileMap:
         self.safe_radius: int = data["safe_zone_radius"]
         self.candy_spawn_count: int = data.get("random_candy_spawns", 0)
         self.battery_spawn_count: int = data.get("random_battery_spawns", 0)
+
+        self.safe_rect: Optional[Tuple[int, int, int, int]] = None
+        rect_data = data.get("safe_zone_rect")
+        if isinstance(rect_data, dict):
+            try:
+                sx = int(rect_data.get("x"))
+                sy = int(rect_data.get("y"))
+                sw = int(rect_data.get("width"))
+                sh = int(rect_data.get("height"))
+            except (TypeError, ValueError):
+                pass
+            else:
+                if sw > 0 and sh > 0:
+                    self.safe_rect = (sx, sy, sw, sh)
 
     def is_safe_tile(self, tile_x: int, tile_y: int) -> bool:
         return self.tiles[tile_y][tile_x] == "safe"
@@ -43,6 +57,9 @@ class TileMap:
         return positions
 
     def _inside_safe_zone(self, tile_x: int, tile_y: int) -> bool:
+        if self.safe_rect:
+            sx, sy, sw, sh = self.safe_rect
+            return sx <= tile_x < sx + sw and sy <= tile_y < sy + sh
         center_x, center_y = self.safe_center
         return (tile_x - center_x) ** 2 + (tile_y - center_y) ** 2 < (self.safe_radius + 1) ** 2
 
@@ -58,3 +75,8 @@ class TileMap:
         for tile_y in range(self.height):
             for tile_x in range(self.width):
                 yield self.tile_to_world_center(tile_x, tile_y)
+
+    @property
+    def safe_rect_tiles(self) -> Optional[Tuple[int, int, int, int]]:
+        return self.safe_rect
+

@@ -2,8 +2,8 @@
   "screen_width": 1024,
   "screen_height": 768,
   "tile_size": 32,
-  "map_width": 48,
-  "map_height": 36,
+  "map_width": 67,
+  "map_height": 59,
   "safe_zone_radius_tiles": 6,
   "night_shrink_to_radius_tiles": 10,
   "night_shrink_speed_tiles_per_sec": 0.4,
@@ -62,6 +62,63 @@
   },
   "player_speed": 180.0,
   "battery_consumed_per_long_hint": 1,
-  "fps": 120
+  "fps": 120,
+  "event_night_delay_sec": 30,
+  "event_success_candy_reward": 2,
+  "event_failure_neutral_upgrade_levels": 1,
+  "event_self_deprecation_counter_cost": 2,
+  "neutral_holder_threshold": 4,
+  "neutral_holder_min": -4,
+  "neutral_holder_max": 4,
+  "neutral_holder_no_upgrade_bonus": 2,
+  "neutral_holder_upgrade_penalty": 1,
+  "neutral_machine_upgrade_cost": 6,
+  "event_counter_items": [
+    "Clothes Pin",
+    "Paper Ship",
+    "Dollhouse",
+    "Umbrella"
+  ],
+  "event_definitions": [
+    {
+      "name": "stink",
+      "counter_item": "Clothes Pin"
+    },
+    {
+      "name": "crying",
+      "counter_item": "Paper Ship"
+    },
+    {
+      "name": "landslide",
+      "counter_item": "Dollhouse"
+    },
+    {
+      "name": "embrassing",
+      "counter_item": "Umbrella"
+    },
+    {
+      "name": "self_deprecation",
+      "counter_item": "any",
+      "counter_amount": 2
+    }
+  ],
+  "machine_level_data": {
+    "2": {
+      "cost": 6,
+      "bonus_chance": 0.25
+    },
+    "3": {
+      "cost": 10,
+      "bonus_chance": 0.5
+    },
+    "4": {
+      "cost": 14,
+      "bonus_chance": 0.75
+    },
+    "5": {
+      "cost": 20,
+      "bonus_chance": 1.0
+    }
+  },
+  "machine_victory_level": 5
 }
-
